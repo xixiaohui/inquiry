@@ -1,7 +1,7 @@
 export default function Home() {
     return (
       <div>
-        3
+            2
       </div>
     )
 }

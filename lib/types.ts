@@ -22,11 +22,13 @@ export type Customer = {
     created_at: string
   }
   
+  
+
   export type FollowUp = {
     id: string
     inquiry_id: string
     action_date: string // ISO 日期字符串
-    method: '邮件' | '电话' | 'WhatsApp' | '其他'
+    method: '邮件' | '电话' | 'WhatsApp' | '样品' | '报价' | '拜访'| '其他'
     content: string
     next_action?: string // ISO 日期字符串
     user_id?: string

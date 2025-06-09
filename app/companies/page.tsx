@@ -97,7 +97,7 @@ export default function CompanyListPage() {
                         <li key={user.id} className="mb-4">
                           👤 {user.name} ({user.email})
 
-                          <Link href={`/customers?user_id=${user.id}`}>
+                          <Link href={`/users-customers?user_id=${user.id}`}>
                             <Button className="ml-4" variant="outline">查看客户</Button>
                           </Link>
                         </li>

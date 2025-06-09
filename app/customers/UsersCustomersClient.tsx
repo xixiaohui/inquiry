@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { Customer, Inquiry } from "@/lib/types";
 import Link from "next/link";
 
-export default function UsersCustomersPage() {
+export default function UsersCustomersClient() {
   const searchParams = useSearchParams();
   const userId = searchParams.get("user_id");
 
@@ -36,13 +36,12 @@ export default function UsersCustomersPage() {
   }, [userId]);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold mb-4">客户及其询盘列表</h1>
-
+    <>
       {customers.map((customer) => (
         <div key={customer.id} className="border rounded p-4 shadow">
-          <h2 className="text-xl font-semibold mb-3">{customer.company_name}</h2>
-
+          <h2 className="text-xl font-semibold mb-3">
+            {customer.company_name}
+          </h2>
           <ul className="space-y-4">
             {inquiries
               .filter((inquiry) => inquiry.customer_id === customer.id)
@@ -50,7 +49,7 @@ export default function UsersCustomersPage() {
                 <li key={inquiry.id}>
                   <Link
                     href={`/inquiries/${inquiry.id}`}
-                    className="block border rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
+                    className="block cursor-pointer border rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
                   >
                     <p className="text-lg font-semibold mb-1">
                       {inquiry.subject || "(无主题)"}
@@ -76,6 +75,6 @@ export default function UsersCustomersPage() {
           </ul>
         </div>
       ))}
-    </div>
+    </>
   );
 }

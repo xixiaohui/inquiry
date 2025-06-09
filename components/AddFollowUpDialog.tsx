@@ -22,6 +22,7 @@ export default function AddFollowUpDialog({ inquiryId }: { inquiryId: string }) 
   const [method, setMethod] = useState("电话")
   const [content, setContent] = useState("")
   const [nextDate, setNextDate] = useState("")
+  const [actionDate, setActionDate] = useState("")
 
   const handleSubmit = async () => {
     if (!content) {
@@ -29,14 +30,24 @@ export default function AddFollowUpDialog({ inquiryId }: { inquiryId: string }) 
       return
     }
 
+    console.log("📤 尝试提交的数据：", {
+      inquiry_id: inquiryId,
+      method,
+      content,
+      action_date: actionDate,
+      next_action: nextDate || null,
+    })
+
     const { error } = await supabase.from("follow_ups").insert({
       inquiry_id: inquiryId,
       method,
       content,
-      next_follow_up_date: nextDate || null,
+      next_action: nextDate || null,
     })
 
     if (error) {
+     
+      console.error("插入失败错误：", error)
       toast.error("提交失败：" + error.message)
     } else {
       toast.success("跟进事件已添加")
@@ -82,7 +93,14 @@ export default function AddFollowUpDialog({ inquiryId }: { inquiryId: string }) 
               onChange={(e) => setContent(e.target.value)}
             />
           </div>
-
+          <div>
+            <Label>本次跟进日期</Label>
+            <Input
+              type="date"
+              value={actionDate}
+              onChange={(e) => setActionDate(e.target.value)}
+            />
+          </div>
           <div>
             <Label>下次跟进日期（可选）</Label>
             <Input

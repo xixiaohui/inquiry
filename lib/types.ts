@@ -20,6 +20,7 @@ export type Customer = {
     message?: string
     channel?: string
     created_at: string
+    subject?: string
   }
   
   

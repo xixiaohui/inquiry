@@ -17,19 +17,36 @@ export default function UsersCustomersClient() {
     if (!userId) return;
 
     const fetchData = async () => {
-      const { data: customerData } = await supabase
+      const { data: customerData, error } = await supabase
         .from("customers")
         .select("*")
         .eq("user_id", userId);
 
-      if (customerData) setCustomers(customerData);
+      if (error) {
+        console.error("查询失败", error.message);
+      } else {
+        setCustomers(customerData);
+        console.log("customerData", customerData);
+      }
 
-      const { data: inquiryData } = await supabase
+      const { data: inquiryData} = await supabase
         .from("inquiries")
-        .select("*")
+        .select(
+          `
+            *,
+            inquiry_status (
+                name,
+                color
+            )
+        `
+        )
         .in("customer_id", customerData?.map((c) => c.id) ?? []);
 
-      if (inquiryData) setInquiries(inquiryData);
+      if (inquiryData) {
+        setInquiries(inquiryData);
+        console.log("inquiryData", inquiryData);
+      }
+
     };
 
     fetchData();
@@ -42,6 +59,8 @@ export default function UsersCustomersClient() {
           <h2 className="text-xl font-semibold mb-3">
             {customer.company_name}
           </h2>
+          
+
           <ul className="space-y-4">
             {inquiries
               .filter((inquiry) => inquiry.customer_id === customer.id)
@@ -51,6 +70,12 @@ export default function UsersCustomersClient() {
                     href={`/inquiries/${inquiry.id}`}
                     className="block cursor-pointer border rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
                   >
+                    <div
+                        className="inline-block px-2 py-1 text-white rounded m-4"
+                        style={{ backgroundColor: inquiry.inquiry_status?.color }}
+                        >
+                        {inquiry.inquiry_status?.name}
+                    </div>
                     <p className="text-lg font-semibold mb-1">
                       {inquiry.subject || "(无主题)"}
                     </p>

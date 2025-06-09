@@ -1,4 +1,12 @@
 // types.ts
+export type Inquiry_Status ={
+  id: string
+  name: string
+  description: string
+  color: string
+  color_index:number
+  created_at:string
+}
 
 export type Customer = {
     id: string
@@ -10,6 +18,7 @@ export type Customer = {
     source?: string
     status: '潜在' | '跟进中' | '报价中' | '样品中' | '成交' | '流失'
     created_at: string
+    
   }
   
   export type Inquiry = {
@@ -21,6 +30,7 @@ export type Customer = {
     channel?: string
     created_at: string
     subject?: string
+    inquiry_status?:Inquiry_Status
   }
   
   

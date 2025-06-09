@@ -12,7 +12,7 @@ export default function InquiryPage() {
   const params = useParams();
   const inquiryId = params?.id as string;
 
-  console.log("inquiryId = ",inquiryId)
+  console.log("inquiryId = ", inquiryId);
 
   const [inquiry, setInquiry] = useState<Inquiry | null>(null);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
@@ -26,7 +26,15 @@ export default function InquiryPage() {
 
       const { data: inquiryData, error: inquiryError } = await supabase
         .from("inquiries")
-        .select("*")
+        .select(
+          `
+            *,
+            inquiry_status (
+                name,
+                color
+            )
+        `
+        )
         .eq("id", inquiryId)
         .single();
 
@@ -46,17 +54,40 @@ export default function InquiryPage() {
   }, [inquiryId]);
 
   if (loading) return <div className="p-6 text-center">加载中...</div>;
-  if (!inquiry) return <div className="p-6 text-red-500 text-center">未找到该询盘。</div>;
+  if (!inquiry)
+    return <div className="p-6 text-red-500 text-center">未找到该询盘。</div>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-3xl font-bold mb-4">{inquiry.subject || "无主题"}</h1>
+      <div
+        className="inline-block px-2 py-1 text-white rounded m-4"
+        style={{ backgroundColor: inquiry.inquiry_status?.color }}
+      >
+        {inquiry.inquiry_status?.name}
+      </div>
       <div className="mb-6 space-y-2 text-gray-700">
-        <p><span className="font-semibold">产品名称：</span>{inquiry.product_name}</p>
-        <p><span className="font-semibold">数量：</span>{inquiry.quantity}</p>
-        {inquiry.message && <p><span className="font-semibold">留言内容：</span>{inquiry.message}</p>}
-        <p><span className="font-semibold">渠道：</span>{inquiry.channel || "未知"}</p>
-        <p className="text-sm text-gray-400">创建时间：{new Date(inquiry.created_at).toLocaleString()}</p>
+        <p>
+          <span className="font-semibold">产品名称：</span>
+          {inquiry.product_name}
+        </p>
+        <p>
+          <span className="font-semibold">数量：</span>
+          {inquiry.quantity}
+        </p>
+        {inquiry.message && (
+          <p>
+            <span className="font-semibold">留言内容：</span>
+            {inquiry.message}
+          </p>
+        )}
+        <p>
+          <span className="font-semibold">渠道：</span>
+          {inquiry.channel || "未知"}
+        </p>
+        <p className="text-sm text-gray-400">
+          创建时间：{new Date(inquiry.created_at).toLocaleString()}
+        </p>
       </div>
 
       <hr className="my-6" />
@@ -69,7 +100,6 @@ export default function InquiryPage() {
       <div className="mt-6">
         <AddFollowUpDialog inquiryId={inquiryId} />
       </div>
-      
     </div>
   );
 }

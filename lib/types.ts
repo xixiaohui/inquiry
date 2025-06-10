@@ -44,6 +44,7 @@ export type Customer = {
     content: string
     next_action?: string // ISO 日期字符串
     created_at: string
+    user_id?: string
   }
   
   export type User = {

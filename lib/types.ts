@@ -18,7 +18,7 @@ export type Customer = {
     source?: string
     status: '潜在' | '跟进中' | '报价中' | '样品中' | '成交' | '流失'
     created_at: string
-    
+    user?: User
   }
   
   export type Inquiry = {
@@ -31,6 +31,7 @@ export type Customer = {
     created_at: string
     subject?: string
     inquiry_status?:Inquiry_Status
+    customer?:Customer
   }
   
   
@@ -42,7 +43,6 @@ export type Customer = {
     method: '邮件' | '电话' | 'WhatsApp' | '样品' | '报价' | '拜访'| '其他'
     content: string
     next_action?: string // ISO 日期字符串
-    user_id?: string
     created_at: string
   }
   

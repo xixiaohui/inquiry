@@ -61,17 +61,9 @@
 import { JSX } from "react"
 import { CalendarDays, Phone, Mail, MessageCircle, PackageCheck,FileText ,Users} from "lucide-react"
 import { cn } from "@/lib/utils"
+import { FollowUp } from "@/lib/types"
 
-export type FollowUp = {
-  id: string
-  inquiry_id: string
-  action_date: string // ISO 日期字符串
-  method: '邮件' | '电话' | 'WhatsApp' | '样品' | '报价' | '拜访'| '其他'
-  content: string
-  next_action?: string // ISO 日期字符串
-  user_id?: string
-  created_at: string
-}
+
 
 export default function FollowUpTimeline({ followUps }: { followUps: FollowUp[] }) {
   const typeIconMap: Record<FollowUp["method"], JSX.Element> = {

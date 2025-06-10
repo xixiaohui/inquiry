@@ -8,6 +8,8 @@ import type { Inquiry, FollowUp } from "@/lib/types";
 import AddFollowUpDialog from "@/components/AddFollowUpDialog";
 import FollowUpTimeline from "@/components/FollowUpTimeline";
 
+import Link from "next/link";
+
 export default function InquiryPage() {
   const params = useParams();
   const inquiryId = params?.id as string;
@@ -32,6 +34,11 @@ export default function InquiryPage() {
             inquiry_status (
                 name,
                 color
+            ),
+            customer:customers(
+                id,
+                company_name,
+                contact_name
             )
         `
         )
@@ -85,6 +92,18 @@ export default function InquiryPage() {
           <span className="font-semibold">渠道：</span>
           {inquiry.channel || "未知"}
         </p>
+        
+
+        <Link
+          href={`/customers/${inquiry.customer?.id}`}
+          className="hover:text-blue-800 cursor-pointer"
+        >
+          <div className="cursor-pointer">
+            <span className="font-medium">来自客户：</span>
+            {inquiry.customer?.company_name}
+          </div>
+        </Link>
+
         <p className="text-sm text-gray-400">
           创建时间：{new Date(inquiry.created_at).toLocaleString()}
         </p>

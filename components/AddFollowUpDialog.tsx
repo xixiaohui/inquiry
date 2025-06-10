@@ -60,7 +60,7 @@ export default function AddFollowUpDialog({ inquiryId }: { inquiryId: string }) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">➕ 添加跟进事件</Button>
+        <Button size="sm" className="cursor-pointer">➕ 添加跟进事件</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

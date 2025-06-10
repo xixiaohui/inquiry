@@ -9,6 +9,8 @@ import AddFollowUpDialog from "@/components/AddFollowUpDialog";
 import FollowUpTimeline from "@/components/FollowUpTimeline";
 
 import Link from "next/link";
+import { toast } from "sonner"
+
 
 export default function InquiryPage() {
   const params = useParams();
@@ -19,6 +21,8 @@ export default function InquiryPage() {
   const [inquiry, setInquiry] = useState<Inquiry | null>(null);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [statusOptions, setStatusOptions] = useState<{ id: string; name: string;color: string }[]>([]);
 
   useEffect(() => {
     if (!inquiryId) return;
@@ -31,7 +35,7 @@ export default function InquiryPage() {
         .select(
           `
             *,
-            inquiry_status (
+            status:inquiry_status (
                 name,
                 color
             ),
@@ -60,6 +64,15 @@ export default function InquiryPage() {
     fetchData();
   }, [inquiryId]);
 
+
+  useEffect(() => {
+    const fetchStatusOptions = async () => {
+      const { data, error } = await supabase.from("inquiry_status").select("id, name,color");
+      if (!error) setStatusOptions(data || []);
+    };
+    fetchStatusOptions();
+  }, []);
+
   if (loading) return <div className="p-6 text-center">加载中...</div>;
   if (!inquiry)
     return <div className="p-6 text-red-500 text-center">未找到该询盘。</div>;
@@ -73,6 +86,9 @@ export default function InquiryPage() {
       >
         {inquiry.status?.name}
       </div>
+
+      
+
       <div className="mb-6 space-y-2 text-gray-700">
         <p>
           <span className="font-semibold">产品名称：</span>
@@ -110,6 +126,47 @@ export default function InquiryPage() {
       </div>
 
       <hr className="my-6" />
+      <div className="mb-4">
+        <label className="font-semibold mr-2">修改状态：</label>
+        <select
+          value={inquiry.status?.id || ""}
+          onChange={async (e) => {
+            const newStatusId = e.target.value;
+            const { error } = await supabase
+              .from("inquiries")
+              .update({ status: newStatusId })
+              .eq("id", inquiryId);
+
+            if (error) {
+              toast.error("状态更新失败：" + error.message);
+            } else {
+              // 更新本地 state
+              setInquiry(prev => {
+                if (!prev) return null;
+              
+                const newStatus = statusOptions.find(s => s.id === newStatusId);
+                if (!newStatus) return prev;
+              
+                // 用类型断言告诉 TS 这个对象就是 Inquiry
+                return {
+                  ...prev,
+                  status: newStatus,
+                } as Inquiry;
+              });
+            }
+          }}
+          className="border rounded px-2 py-1"
+        >
+          <option value="">请选择状态</option>
+          {statusOptions.map((status) => (
+            <option key={status.id} value={status.id}>
+              {status.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <hr className="my-6" />
+      
       <h2 className="text-2xl font-semibold mb-3">跟进记录</h2>
       {followUps.length > 0 ? (
         <FollowUpTimeline followUps={followUps} />

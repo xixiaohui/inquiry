@@ -76,7 +76,7 @@ export default function InquiryListPage() {
               inquiries.map((inquiry) => (
                 
                   <TableRow key={inquiry.id}
-                  className="cursor-pointer hover:bg-gray-100"
+                  className="cursor-pointer hover:bg-blue-100"
                   onClick={() => router.push(`/inquiries/${inquiry.id}`)}
                   >
 

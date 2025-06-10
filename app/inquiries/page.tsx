@@ -17,7 +17,7 @@ export default function InquiriesPage() {
         .select(
           `
             *,
-            inquiry_status (
+            status:inquiry_status (
                 name,
                 color
             ),

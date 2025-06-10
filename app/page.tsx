@@ -38,7 +38,7 @@ export default function HomePage() {
 
             return (
               <li key={customer.id} className="mb-10">
-                <h2 className="m-4 text-3xl">{customer.company_name}</h2>
+                <h2 className="m-4 text-3xl">{customer.company_name || customer.contact_name}</h2>
 
                 {customerInquiries.length === 0 ? (
                   <p className="text-gray-500 text-sm mx-4">暂无询盘</p>

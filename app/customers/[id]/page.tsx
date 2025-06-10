@@ -28,7 +28,7 @@ export default function CustomerDetailPage() {
           email,
           phone,
           country,
-          user:users(
+          user_id:users(
             id,
             name
           )
@@ -61,7 +61,7 @@ export default function CustomerDetailPage() {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* 客户信息 */}
       <div className="bg-white p-6 rounded shadow">
-        <h1 className="text-2xl font-bold mb-2">{customer.company_name}</h1>
+        <h1 className="text-2xl font-bold mb-2">{customer.company_name || customer.contact_name}</h1>
         <p>
           <span className="font-semibold">联系人：</span>{" "}
           {customer.contact_name || "无"}
@@ -76,10 +76,10 @@ export default function CustomerDetailPage() {
           <span className="font-semibold">国家：</span>{" "}
           {customer.country || "无"}
         </p>
-        <Link href={`/customers?user_id=${customer.user?.id}`}>
+        <Link href={`/customers?user_id=${customer.user_id?.id}`}>
             <p className="hover:text-blue-800">
             <span className="font-semibold mt-6">客户属于：</span>{" "}
-            {customer.user?.name || "无"}
+            {customer.user_id?.name || "无"}
             </p>
         </Link>
       </div>

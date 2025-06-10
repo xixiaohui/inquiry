@@ -57,7 +57,7 @@ export default function UsersCustomersClient() {
       {customers.map((customer) => (
         <div key={customer.id} className="border rounded p-4 shadow">
           <h2 className="text-xl font-semibold mb-3">
-            {customer.company_name}
+            {customer.company_name || customer.contact_name}
           </h2>
           
 
@@ -72,9 +72,9 @@ export default function UsersCustomersClient() {
                   >
                     <div
                         className="inline-block px-2 py-1 text-white rounded m-4"
-                        style={{ backgroundColor: inquiry.inquiry_status?.color }}
+                        style={{ backgroundColor: inquiry.status?.color }}
                         >
-                        {inquiry.inquiry_status?.name}
+                        {inquiry.status?.name}
                     </div>
                     <p className="text-lg font-semibold mb-1">
                       {inquiry.subject || "(无主题)"}

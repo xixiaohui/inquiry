@@ -64,9 +64,9 @@ export default function InquiriesPage() {
                   {inquiry.subject || "（无主题）"}
                   <div
                     className="inline-block px-2 py-1 text-white rounded m-4"
-                    style={{ backgroundColor: inquiry.inquiry_status?.color }}
+                    style={{ backgroundColor: inquiry.status?.color }}
                   >
-                    {inquiry.inquiry_status?.name}
+                    {inquiry.status?.name}
                   </div>
                 </div>
               </div>

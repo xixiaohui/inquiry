@@ -18,7 +18,7 @@ export type Customer = {
     source?: string
     status: '潜在' | '跟进中' | '报价中' | '样品中' | '成交' | '流失'
     created_at: string
-    user?: User
+    user_id?: User
   }
   
   export type Inquiry = {
@@ -30,7 +30,7 @@ export type Customer = {
     channel?: string
     created_at: string
     subject?: string
-    inquiry_status?:Inquiry_Status
+    status?:Inquiry_Status
     customer?:Customer
   }
   

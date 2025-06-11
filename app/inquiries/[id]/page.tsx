@@ -36,6 +36,7 @@ export default function InquiryPage() {
           `
             *,
             status:inquiry_status (
+                id,
                 name,
                 color
             ),
@@ -72,6 +73,8 @@ export default function InquiryPage() {
     };
     fetchStatusOptions();
   }, []);
+
+  
 
   if (loading) return <div className="p-6 text-center">加载中...</div>;
   if (!inquiry)

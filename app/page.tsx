@@ -3,15 +3,18 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { User, Customer, Inquiry , FollowUp } from "@/lib/types";
+import { User, Customer, Inquiry , FollowUp , Inquiry_Status} from "@/lib/types";
 
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import FollowUpTimeline from "@/components/FollowUpTimeline";
 import AddFollowUpDialog from "@/components/AddFollowUpDialog";
 
-
+import { toast } from "sonner"
 
 type Selection =
   | { type: "user"; data: User }
@@ -19,13 +22,18 @@ type Selection =
   | { type: "inquiry"; data: Inquiry }
   | null;
 
+
+
 export default function DashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [selected, setSelected] = useState<Selection>(null);
-
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
+
+  const [statuses, setStatuses] = useState<Inquiry_Status[]>([]);
+
+
 
 
   useEffect(() => {
@@ -58,15 +66,20 @@ export default function DashboardPage() {
               user_id:users(id, name)
             ),
             status:inquiry_status (
+                id,
                 name,
                 color
             )
           `
         );
 
+      const { data: statusData } = await supabase.from("inquiry_status").select("*");
+
       if (usersData) setUsers(usersData as User[]);
       if (customersData) setCustomers(customersData as unknown as Customer[]);
       if (inquiriesData) setInquiries(inquiriesData as unknown as Inquiry[]);
+
+      if (statusData) setStatuses(statusData);
     };
 
     fetchData();
@@ -88,6 +101,37 @@ export default function DashboardPage() {
   
     fetchFollowUps();
   }, [selected]);
+
+
+  const updateInquiryStatus = async (newStatusId: string) => {
+    if (selected?.type !== "inquiry") return;
+
+    const { error } = await supabase
+      .from("inquiries")
+      .update({ status: newStatusId  })
+      .eq("id", selected.data.id);
+
+    if (error) {
+      toast.error("更新状态失败");
+    } else {
+      toast.success("状态更新成功");
+      const statusObj = statuses.find((s) => s.id === newStatusId);
+      setSelected({
+        type: "inquiry",
+        data: {
+          ...selected.data,
+          status: statusObj ?? {
+            id: newStatusId,
+            name: "未知状态",
+            color: "#999",
+            description: "",
+            color_index: 0,
+            created_at: ""
+          },
+        },
+      });
+    }
+  };
 
    // 计算当前选中用户 id 和客户 id
    const selectedUserId = (() => {
@@ -174,7 +218,28 @@ export default function DashboardPage() {
                           ? "bg-blue-100"
                           : ""
                       }`}
-                      onClick={() => setSelected({ type: "inquiry", data: inq })}
+                      onClick={async () => {
+                        const { data: updatedInquiry } = await supabase
+                          .from("inquiries")
+                          .select(`
+                            id, 
+                            product_name, 
+                            quantity,
+                            message,
+                            channel,
+                            subject,
+                            customer:customers(id, company_name, contact_name, user_id:users(id, name)),
+                            status:inquiry_status(id, name, color)
+                          `)
+                          .eq("id", inq.id)
+                          .single();
+                      
+                        if (updatedInquiry) {
+                          setSelected({ type: "inquiry", data: updatedInquiry as unknown as Inquiry });
+                        } else {
+                          toast.error("获取最新询盘信息失败");
+                        }
+                      }}
                     >
                       <div className="font-medium">{inq.subject}</div>
                       <div className="text-sm text-muted-foreground">数量: {inq.quantity}</div>
@@ -223,6 +288,27 @@ export default function DashboardPage() {
                     >
                       {selected.data.status?.name}
                     </div>
+
+                    <hr className="my-6" />
+                    <div className="mb-4">
+                      <p className="font-semibold">修改状态：</p>
+                      <Select
+                        value={selected.data.status?.id} // ✅ 使用 id 而不是 name
+                        onValueChange={updateInquiryStatus} // 会传 status.id
+                      >
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="选择状态" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statuses.map((s) => (
+                            <SelectItem key={s.id} value={s.id}> {/* ✅ value 为 status.id */}
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
 
                     <hr className="my-6" />
 

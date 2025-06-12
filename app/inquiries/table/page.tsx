@@ -22,6 +22,7 @@ export default function InquiryListPage() {
 
   const [filterStatusId, setFilterStatusId] = useState("")
   const [keyword, setKeyword] = useState("")
+  const [selectedMonth, setSelectedMonth] = useState<string>("")
 
   const fetchStatusOptions = useCallback(async () => {
     const { data } = await supabase.from("inquiry_status").select("id, name, color")
@@ -38,6 +39,20 @@ export default function InquiryListPage() {
 
     if (filterStatusId) {
       query = query.eq("status", filterStatusId)
+    }
+
+    // 根据 selectedMonth 过滤月份
+    if (selectedMonth !== "2025-all") {
+      if (selectedMonth) {
+        // 如果 selectedMonth 不是 "2025-all"，则按月份筛选
+        const [year, month] = selectedMonth.split('-')
+        query = query
+          .gte("created_at", `${year}-${month}-01`)
+          .lt("created_at", `${year}-${parseInt(month, 10) + 1}-01`) // 下一个月的 1 号作为结束日期
+      }
+    } else {
+      // 处理2025年全部月份的查询
+      query = query.gte("created_at", "2025-01-01").lte("created_at", "2025-12-31")
     }
 
     const { data, error } = await query
@@ -59,7 +74,7 @@ export default function InquiryListPage() {
     }
 
     setLoading(false)
-  }, [filterStatusId, keyword])
+  }, [filterStatusId, keyword, selectedMonth])
 
   useEffect(() => {
     fetchStatusOptions()
@@ -67,7 +82,7 @@ export default function InquiryListPage() {
 
   useEffect(() => {
     fetchInquiries()
-  }, [filterStatusId])
+  }, [filterStatusId, keyword, selectedMonth])
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -75,19 +90,36 @@ export default function InquiryListPage() {
 
       {/* 筛选区域 */}
       <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
-      <Select value={filterStatusId} onValueChange={setFilterStatusId}>
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="按状态筛选" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">全部状态</SelectItem>
-          {statusOptions.map((status) => (
-            <SelectItem key={status.id} value={status.id}>
-              {status.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <Select value={filterStatusId} onValueChange={setFilterStatusId}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="按状态筛选" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">全部状态</SelectItem>
+            {statusOptions.map((status) => (
+              <SelectItem key={status.id} value={status.id}>
+                {status.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="按月份筛选" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="2025-all">2025年全部月份</SelectItem>
+            {Array.from({ length: 12 }, (_, i) => {
+              const month = (i + 1).toString().padStart(2, "0")
+              return (
+                <SelectItem key={month} value={`2025-${month}`}> {/* 使用你想要的年份 */}
+                  {`${month} 月`}
+                </SelectItem>
+              )
+            })}
+          </SelectContent>
+        </Select>
 
         <Input
           type="text"
@@ -115,12 +147,12 @@ export default function InquiryListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>客户</TableHead>
-              <TableHead>产品名称</TableHead>
-              <TableHead>数量</TableHead>
-              <TableHead>渠道</TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead>状态</TableHead>
+              <TableHead className="font-semibold">客户</TableHead>
+              <TableHead className="font-semibold">产品名称</TableHead>
+              <TableHead className="font-semibold">数量</TableHead>
+              <TableHead className="font-semibold">渠道</TableHead>
+              <TableHead className="font-semibold">创建时间</TableHead>
+              <TableHead className="font-semibold">状态</TableHead>
             </TableRow>
           </TableHeader>
 

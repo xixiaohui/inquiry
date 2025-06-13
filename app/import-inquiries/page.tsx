@@ -20,7 +20,8 @@ export default function ImportInquiriesPage() {
       "message",
       "channel",
       "subject",
-      "status"
+      "status",
+      "created_at"
     ]
     const csvContent = headers.join(",") + "\n"
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
@@ -63,6 +64,7 @@ export default function ImportInquiriesPage() {
       channel: row.channel || null,
       subject: row.subject || null,
       status: row.status || null,
+      created_at: row.created_at || null,
     }))
 
     const { error } = await supabase.from("inquiries").insert(records)

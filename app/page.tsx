@@ -177,7 +177,7 @@ export default function DashboardPage() {
         {/* 客户列 */}
         <Panel defaultSize={20} minSize={10}>
           <Card className="h-full overflow-y-auto rounded-none border-none">
-            <CardHeader><CardTitle>所有客户</CardTitle></CardHeader>
+            <CardHeader><CardTitle>所有客户 {customers.filter((c) => c.user_id?.id === selectedUserId).length}</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {selectedUserId ? (
                 customers

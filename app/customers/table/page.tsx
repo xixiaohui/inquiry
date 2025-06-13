@@ -33,8 +33,8 @@ export default function CustomerListPage() {
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState(""); // 新增的月份选择
+  const [selectedUser, setSelectedUser] = useState("all");
+  const [selectedMonth, setSelectedMonth] = useState("2025-all"); // 新增的月份选择
 
   const [userOptions, setUserOptions] = useState<
     { id: string; name: string }[]
@@ -108,7 +108,7 @@ export default function CustomerListPage() {
   }, [searchTerm, selectedUser, selectedMonth, customers]);
 
   return (
-    <div className="p-6 max-w-8xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">客户列表</h1>
 
       {/* 筛选区域 */}
@@ -159,7 +159,7 @@ export default function CustomerListPage() {
         <Table>
           <TableHeader>
             <TableRow >
-              <TableHead className="font-semibold">公司名称</TableHead>
+              <TableHead className="font-semibold">公司名称 ({filteredCustomers.length})</TableHead>
               <TableHead className="font-semibold">联系人</TableHead>
               <TableHead className="font-semibold">邮箱</TableHead>
               <TableHead className="font-semibold">电话</TableHead>
@@ -196,8 +196,11 @@ export default function CustomerListPage() {
                 >
                   <TableCell>{customer.company_name}</TableCell>
                   <TableCell>{customer.contact_name || "-"}</TableCell>
-                  <TableCell>{customer.email || "-"}</TableCell>
-                  <TableCell>{customer.phone || "-"}</TableCell>
+                  
+                  {/* <TableCell>{ "hiden" || customer.email || "-"}</TableCell> */}
+                  {/* <TableCell>{customer.phone || "-"}</TableCell> */}
+                  <TableCell>{"~"}</TableCell>
+                  <TableCell>{"-"}</TableCell>
                   <TableCell>{customer.country || "-"}</TableCell>
                   <TableCell>{customer.source || "-"}</TableCell>
                   <TableCell>

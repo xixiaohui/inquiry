@@ -67,10 +67,12 @@ export default function CustomerDetailPage() {
           {customer.contact_name || "无"}
         </p>
         <p>
-          <span className="font-semibold">邮箱：</span> {customer.email || "无"}
+          {/* <span className="font-semibold">邮箱：</span> {customer.email || "无"} */}
+          <span className="font-semibold">邮箱：</span> {"~"}
         </p>
         <p>
-          <span className="font-semibold">电话：</span> {customer.phone || "无"}
+          {/* <span className="font-semibold">电话：</span> {customer.phone || "无"} */}
+          <span className="font-semibold">电话：</span> {"-"}
         </p>
         <p>
           <span className="font-semibold">国家：</span>{" "}

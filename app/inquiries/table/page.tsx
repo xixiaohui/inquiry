@@ -147,8 +147,9 @@ export default function InquiryListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-semibold">客户</TableHead>
-              <TableHead className="font-semibold">产品名称</TableHead>
+              <TableHead className="font-semibold">客户 </TableHead>
+              <TableHead className="font-semibold">询盘主题 ({inquiries.length})</TableHead>
+              <TableHead className="font-semibold">产品</TableHead>
               <TableHead className="font-semibold">数量</TableHead>
               <TableHead className="font-semibold">渠道</TableHead>
               <TableHead className="font-semibold">创建时间</TableHead>
@@ -176,7 +177,8 @@ export default function InquiryListPage() {
                   onClick={() => router.push(`/inquiries/${inquiry.id}`)}
                 >
                   <TableCell>{inquiry.customer?.company_name || inquiry.customer?.contact_name || "-"}</TableCell>
-                  <TableCell>{inquiry.product_name}</TableCell>
+                  <TableCell className="truncate max-w-[150px]">{inquiry.subject}</TableCell>
+                  <TableCell className="truncate max-w-[150px]">{inquiry.product_name}</TableCell>
                   <TableCell>{inquiry.quantity}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{inquiry.channel || "未知"}</Badge>

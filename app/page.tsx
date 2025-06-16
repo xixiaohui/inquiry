@@ -44,11 +44,12 @@ export default function DashboardPage() {
       const { data: customersData } = await supabase.from("customers").select(`
           id, 
           contact_name,
+          created_at,
           user_id:users(
               id,
               name
             )
-          `);
+          `).order("created_at", { ascending: false });
       const { data: inquiriesData } = await supabase
         .from("inquiries")
         .select(
@@ -59,6 +60,7 @@ export default function DashboardPage() {
             message,
             channel,
             subject,
+            created_at,
             customer:customers(
               id, 
               company_name, 
@@ -71,7 +73,7 @@ export default function DashboardPage() {
                 color
             )
           `
-        );
+        ).order("created_at", { ascending: false });
 
       const { data: statusData } = await supabase.from("inquiry_status").select("*");
 
@@ -228,6 +230,7 @@ export default function DashboardPage() {
                             message,
                             channel,
                             subject,
+                            created_at,
                             customer:customers(id, company_name, contact_name, user_id:users(id, name)),
                             status:inquiry_status(id, name, color)
                           `)
@@ -269,9 +272,13 @@ export default function DashboardPage() {
                   <>
                     <p className="font-semibold">客户联系人：</p>
                     <p>{selected.data.contact_name}</p>
+                    <p className="font-semibold">创建时间：</p>
+                    <p>{selected.data.created_at}</p>
                   </>
                 ) : (
                   <div>
+                    <p className="font-semibold">创建时间：</p>
+                    <p>{selected.data.created_at}</p>
                     <p className="font-semibold">产品名称：</p>
                     <p>{selected.data.product_name}</p>
                     <p className="font-semibold">数量：</p>
@@ -281,6 +288,7 @@ export default function DashboardPage() {
                     <p className="font-semibold">沟通渠道：</p>
                     <p>{selected.data.channel}</p>
 
+                    <hr className="my-6" />
                     
                     <div
                       className="inline-block px-2 py-1 text-white rounded m-4"
@@ -289,7 +297,6 @@ export default function DashboardPage() {
                       {selected.data.status?.name}
                     </div>
 
-                    <hr className="my-6" />
                     <div className="mb-4">
                       <p className="font-semibold">修改状态：</p>
                       <Select

@@ -40,14 +40,19 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">添加数据</h4>
             <ul>
-              <li>
+              {/* <li>
                 <Link href="/import-customer" passHref>
-                  <Button variant="link" className="text-sm  text-white hover:underline">+ 客户</Button>
+                  <Button variant="link" className="text-sm  text-white hover:underline">+ 客户 </Button>
                 </Link>
               </li>
               <li>
                 <Link href="/import-inquiries" passHref>
                   <Button variant="link" className="text-sm  text-white hover:underline">+ 询盘</Button>
+                </Link>
+              </li> */}
+              <li>
+                <Link href="/import-customer-in" passHref>
+                  <Button variant="link" className="text-sm  text-white hover:underline">+ 客户 +询盘</Button>
                 </Link>
               </li>
             </ul>

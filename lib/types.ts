@@ -19,6 +19,7 @@ export type Customer = {
     status: '潜在' | '跟进中' | '报价中' | '样品中' | '成交' | '流失'
     created_at: string
     user_id?: User
+    website?: string
   }
   
   export type Inquiry = {

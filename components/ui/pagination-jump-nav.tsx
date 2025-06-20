@@ -41,7 +41,7 @@ export function PaginationJumpNav({
     const showLeftDots = leftSibling > 2
     const showRightDots = rightSibling < totalPages - 1
 
-    const pages: (number | string)[] = []
+    // const pages: (number | string)[] = []
 
     if (!showLeftDots && showRightDots) {
       const leftItems = range(1, 3 + 2 * siblingCount)

@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { PaginationJumpNav } from "@/components/ui/pagination-jump-nav"
 
 export default function InquiryListPage() {
   const router = useRouter()
@@ -24,6 +25,11 @@ export default function InquiryListPage() {
   const [keyword, setKeyword] = useState("")
   const [selectedMonth, setSelectedMonth] = useState<string>("")
 
+  // ✅ 分页
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 17
+  const [totalCount, setTotalCount] = useState(0)
+
   const fetchStatusOptions = useCallback(async () => {
     const { data } = await supabase.from("inquiry_status").select("id, name, color")
     if (data) setStatusOptions(data)
@@ -34,28 +40,32 @@ export default function InquiryListPage() {
 
     let query = supabase
       .from("inquiries")
-      .select(`*, status:inquiry_status(id, name, color), customer:customers(id, company_name, contact_name)`)
+      .select(`*, status:inquiry_status(id, name, color), customer:customers(id, company_name, contact_name)`, {
+        count: "exact"
+      })
       .order("created_at", { ascending: false })
 
-    if (filterStatusId) {
+    if (filterStatusId && filterStatusId !== "all") {
       query = query.eq("status", filterStatusId)
     }
 
-    // 根据 selectedMonth 过滤月份
     if (selectedMonth !== "2025-all") {
       if (selectedMonth) {
-        // 如果 selectedMonth 不是 "2025-all"，则按月份筛选
-        const [year, month] = selectedMonth.split('-')
+        const [year, month] = selectedMonth.split("-")
         query = query
           .gte("created_at", `${year}-${month}-01`)
-          .lt("created_at", `${year}-${parseInt(month, 10) + 1}-01`) // 下一个月的 1 号作为结束日期
+          .lt("created_at", `${year}-${parseInt(month, 10) + 1}-01`)
       }
     } else {
-      // 处理2025年全部月份的查询
       query = query.gte("created_at", "2025-01-01").lte("created_at", "2025-12-31")
     }
 
-    const { data, error } = await query
+    const from = (currentPage - 1) * pageSize
+    const to = from + pageSize - 1
+
+    query = query.range(from, to)
+
+    const { data, error, count } = await query
 
     const filtered = (data || []).filter((inquiry) => {
       if (!keyword) return true
@@ -71,10 +81,11 @@ export default function InquiryListPage() {
 
     if (!error) {
       setInquiries(filtered)
+      setTotalCount(count || 0)
     }
 
     setLoading(false)
-  }, [filterStatusId, keyword, selectedMonth])
+  }, [filterStatusId, keyword, selectedMonth, currentPage])
 
   useEffect(() => {
     fetchStatusOptions()
@@ -82,7 +93,7 @@ export default function InquiryListPage() {
 
   useEffect(() => {
     fetchInquiries()
-  }, [filterStatusId, keyword, selectedMonth])
+  }, [filterStatusId, keyword, selectedMonth, currentPage])
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -90,7 +101,10 @@ export default function InquiryListPage() {
 
       {/* 筛选区域 */}
       <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
-        <Select value={filterStatusId} onValueChange={setFilterStatusId}>
+        <Select value={filterStatusId} onValueChange={(val) => {
+          setFilterStatusId(val)
+          setCurrentPage(1)
+        }}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="按状态筛选" />
           </SelectTrigger>
@@ -104,7 +118,10 @@ export default function InquiryListPage() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+        <Select value={selectedMonth} onValueChange={(val) => {
+          setSelectedMonth(val)
+          setCurrentPage(1)
+        }}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="按月份筛选" />
           </SelectTrigger>
@@ -113,7 +130,7 @@ export default function InquiryListPage() {
             {Array.from({ length: 12 }, (_, i) => {
               const month = (i + 1).toString().padStart(2, "0")
               return (
-                <SelectItem key={month} value={`2025-${month}`}> {/* 使用你想要的年份 */}
+                <SelectItem key={month} value={`2025-${month}`}>
                   {`${month} 月`}
                 </SelectItem>
               )
@@ -125,16 +142,27 @@ export default function InquiryListPage() {
           type="text"
           placeholder="客户/产品关键词"
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(e) => {
+            setKeyword(e.target.value)
+            setCurrentPage(1)
+          }}
           className="w-full md:w-[300px]"
         />
 
-        <Button onClick={fetchInquiries}>搜索</Button>
+        <Button onClick={() => {
+          setCurrentPage(1)
+          fetchInquiries()
+        }}>
+          搜索
+        </Button>
+
         <Button
           variant="outline"
           onClick={() => {
             setFilterStatusId("")
+            setSelectedMonth("")
             setKeyword("")
+            setCurrentPage(1)
             fetchInquiries()
           }}
         >
@@ -147,8 +175,8 @@ export default function InquiryListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-semibold">客户 </TableHead>
-              <TableHead className="font-semibold">询盘主题 ({inquiries.length})</TableHead>
+              <TableHead className="font-semibold">客户</TableHead>
+              <TableHead className="font-semibold">询盘主题</TableHead>
               <TableHead className="font-semibold">信息</TableHead>
               <TableHead className="font-semibold">渠道</TableHead>
               <TableHead className="font-semibold">创建时间</TableHead>
@@ -166,7 +194,9 @@ export default function InquiryListPage() {
               </TableRow>
             ) : inquiries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-6 text-gray-500">暂无数据</TableCell>
+                <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                  暂无数据
+                </TableCell>
               </TableRow>
             ) : (
               inquiries.map((inquiry) => (
@@ -178,7 +208,6 @@ export default function InquiryListPage() {
                   <TableCell>{inquiry.customer?.contact_name || inquiry.customer?.company_name || "-"}</TableCell>
                   <TableCell className="truncate max-w-[150px]">{inquiry.subject}</TableCell>
                   <TableCell className="truncate max-w-[150px]">{inquiry.message}</TableCell>
-
                   <TableCell>
                     <Badge variant="outline">{inquiry.channel || "未知"}</Badge>
                   </TableCell>
@@ -198,6 +227,14 @@ export default function InquiryListPage() {
           </TableBody>
         </Table>
       </Card>
+
+      {/* 分页组件 */}
+      <PaginationJumpNav
+        currentPage={currentPage}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   )
 }

@@ -39,7 +39,7 @@ export default function CsvImport() {
     let successCount = 0;
 
     for (const row of rows) {
-      if (!row.company_name || !row.product_name || !row.quantity) {
+      if (!row.contact_name) {
         toast.error("缺少必要字段，跳过某行");
         continue;
       }

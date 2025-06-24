@@ -205,7 +205,7 @@ export default function InquiryListPage() {
                   className="cursor-pointer hover:bg-blue-100"
                   onClick={() => router.push(`/inquiries/${inquiry.id}`)}
                 >
-                  <TableCell>{inquiry.customer?.contact_name || inquiry.customer?.company_name || "-"}</TableCell>
+                  <TableCell className="truncate max-w-[150px]">{inquiry.customer?.contact_name || inquiry.customer?.company_name || "-"}</TableCell>
                   <TableCell className="truncate max-w-[150px]">{inquiry.subject}</TableCell>
                   <TableCell className="truncate max-w-[150px]">{inquiry.message}</TableCell>
                   <TableCell>
